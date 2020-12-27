@@ -5,12 +5,14 @@ on:
     branches: '*'
   pull_request:
     branches: '*'
+  release:
+    types: published
 
 jobs:
   gen-image:
     strategy:
       matrix:
-        os: [ubuntu-16.04]
+        os: [ubuntu-18.04]
       fail-fast: false
     runs-on: ${{ matrix.os }}
     name: build.py ${{ matrix.os }}
@@ -30,3 +32,26 @@ jobs:
           name: raspberry-pi-os-autologin-img
           path: rpiosimage/*-autologin.img
           if-no-files-found: error
+
+  release-asset:
+    name: Upload artifact as GH Release asset
+    needs: gen-image
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download updated OS image zip
+        uses: actions/download-artifact@v2
+        id: download-zip
+        with:
+          name: 'raspberry-pi-os-autologin-img.zip'
+      - name: 'Echo download path'
+        run: echo ${{steps.download-zip.outputs.download-path}}
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{github.event.release.upload_url}}
+          asset_path: ${{steps.download-zip.outputs.download-path}}
+          asset_name: raspberry-pi-os-autologin-img.zip
+          asset_content_type: application/zip
