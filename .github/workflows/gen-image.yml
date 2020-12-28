@@ -1,4 +1,4 @@
-name: Generate autologin image
+name: Generate and upload custom image
 
 on:
   push:
@@ -10,12 +10,8 @@ on:
 
 jobs:
   gen-image:
-    strategy:
-      matrix:
-        os: [ubuntu-18.04]
-      fail-fast: false
-    runs-on: ${{ matrix.os }}
-    name: build.py ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    name: Generate autologin image
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
@@ -39,13 +35,15 @@ jobs:
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        shell: bash
       - name: Download updated OS image zip
         uses: actions/download-artifact@v2
         id: download-zip
         with:
-          name: 'raspberry-pi-os-autologin-img.zip'
-      - name: 'Echo download path'
-        run: echo ${{steps.download-zip.outputs.download-path}}
+          name: raspberry-pi-os-autologin-img
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
@@ -53,5 +51,5 @@ jobs:
         with:
           upload_url: ${{github.event.release.upload_url}}
           asset_path: ${{steps.download-zip.outputs.download-path}}
-          asset_name: raspberry-pi-os-autologin-img.zip
+          asset_name: raspberry-pi-os-${{ steps.get_version.outputs.VERSION }}-autologin-img.zip
           asset_content_type: application/zip
