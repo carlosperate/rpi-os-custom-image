@@ -22,11 +22,17 @@ jobs:
         run: pip install -r requirements.txt
       - name: Run script
         run: python run_all.py
-      - name: Upload hex file
+      - name: Upload autologin image
         uses: actions/upload-artifact@v2
         with:
           name: raspberry-pi-os-autologin-img
           path: rpiosimage/*-autologin.img
+          if-no-files-found: error
+      - name: Upload autologin + ssh image
+        uses: actions/upload-artifact@v2
+        with:
+          name: raspberry-pi-os-autologin-ssh-img
+          path: rpiosimage/*-autologin-ssh.img
           if-no-files-found: error
 
   release-asset:
@@ -39,12 +45,26 @@ jobs:
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
         shell: bash
-      - name: Download updated OS image zip
+      - name: Download autologin OS image zip
         uses: actions/download-artifact@v2
         id: download-zip
         with:
           name: raspberry-pi-os-autologin-img
-      - name: Upload Release Asset
+      - name: Download autologin + ssh OS image zip
+        uses: actions/download-artifact@v2
+        id: download-zip
+        with:
+          name: raspberry-pi-os-autologin-img
+      - name: Upload autologin image release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{github.event.release.upload_url}}
+          asset_path: ${{steps.download-zip.outputs.download-path}}
+          asset_name: raspberry-pi-os-${{ steps.get_version.outputs.VERSION }}-autologin-img.zip
+          asset_content_type: application/zip
+      - name: Upload autologin + ssh image release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -4,7 +4,6 @@
 import os
 import sys
 import uuid
-import shutil
 
 import pexpect
 
@@ -14,12 +13,12 @@ import pexpect
 
 # If this script is run on its own, select here what features to update
 AUTOLOGIN = True
+SSH = True
 
 # Configuration data end
 ###############################################################################
 
 DOCKER_IMAGE = "lukechilds/dockerpi:vm"
-DOCKER_CONTAINER_NAME= "rpi-os-autologin-{}".format(str(uuid.uuid4())[:8])
 
 RPI_OS_USERNAME = "pi"
 RPI_OS_PASSWORD = "raspberry"
@@ -48,26 +47,22 @@ def launch_docker_spawn(img_path):
     if not img_path.endswith(".img"):
         raise Exception("Provided OS .img file does not have the right extension: {}".format(img_path))
 
-    original_img = img_path
-    # TODO: .replace will cause issues if `.img` is present somewhere else in path
-    new_img = img_path.replace(".img", "-autologin.img")
-    shutil.copyfile(img_path, new_img)
-    new_img = os.path.abspath(new_img)
-
+    docker_container_name = "rpi-os-{}".format(str(uuid.uuid4())[:8])
     docker_cmd = " ".join([
         "docker",
         "run",
         "-it",
         "--rm",
-        "--name {}".format(DOCKER_CONTAINER_NAME),
-        "-v {}:/sdcard/filesystem.img".format(new_img),
+        "--name {}".format(docker_container_name),
+        "-v {}:/sdcard/filesystem.img".format(img_path),
         DOCKER_IMAGE
     ])
     print("Docker cmd: {}".format(docker_cmd))
 
     child = pexpect.spawn(docker_cmd, timeout=600, encoding='utf-8')
     child.logfile = sys.stdout
-    return child
+
+    return child, docker_container_name
 
 
 def login(child):
@@ -78,7 +73,7 @@ def login(child):
     child.expect_exact(BASH_PROMPT)
 
 
-def add_autologin(child):
+def enable_autologin(child):
     # Setup a service to configure autologin in ttyAMA0, which is what QEMU uses
     child.sendline("sudo mkdir -pv /etc/systemd/system/serial-getty@ttyAMA0.service.d")
     child.expect_exact(BASH_PROMPT)
@@ -103,14 +98,21 @@ def add_autologin(child):
     child.expect_exact(BASH_PROMPT)
 
 
-def run_edits(img_path, needs_login=True, autologin=None):
+def enable_ssh(child):
+    child.sendline("sudo systemctl enable ssh")
+    child.expect_exact(BASH_PROMPT)
+
+
+def run_edits(img_path, needs_login=True, autologin=None, ssh=None):
     print("Staring Raspberry Pi OS customisation: {}".format(img_path))
     try:
-        child = launch_docker_spawn(img_path)
+        child, docker_container_name = launch_docker_spawn(img_path)
         if needs_login:
             login(child)
         if autologin or (autologin is None and AUTOLOGIN):
-            add_autologin(child)
+            enable_autologin(child)
+        if ssh or (ssh is None and SSH):
+            enable_ssh(child)
         # We are done, let's exit
         child.sendline("sudo shutdown now")
         child.expect(pexpect.EOF)
@@ -123,15 +125,15 @@ def run_edits(img_path, needs_login=True, autologin=None):
             print("! Exit status: {}".format(child.exitstatus))
             print("! Signal status: {}".format(child.signalstatus))
         finally:
-            print('! Check if {} container is still running'.format(DOCKER_CONTAINER_NAME))
+            print('! Check if {} container is still running'.format(docker_container_name))
             container_id = pexpect.run(
-                'docker ps --filter "name={}" -q'.format(DOCKER_CONTAINER_NAME),
+                'docker ps --filter "name={}" -q'.format(docker_container_name),
             )
             print(container_id)
             if container_id:
-                print('! Stopping {} container'.format(DOCKER_CONTAINER_NAME))
+                print('! Stopping {} container'.format(docker_container_name))
                 cmd_op, exit_status  = pexpect.run(
-                    'docker stop {}'.format(DOCKER_CONTAINER_NAME), withexitstatus=True,
+                    'docker stop {}'.format(docker_container_name), withexitstatus=True,
                 )
                 print("{}\n! Exit status: {}".format(cmd_op, exit_status))
             else:
