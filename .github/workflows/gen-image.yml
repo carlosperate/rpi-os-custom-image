@@ -21,7 +21,7 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.txt
       - name: Run script
-        run: python add_autologin.py
+        run: python run_all.py
       - name: Upload hex file
         uses: actions/upload-artifact@v2
         with:
