@@ -118,4 +118,4 @@ OS_IMAGE_SHA_TYPE = "256"
 ###############################################################################
 ```
 
-Changing these URLs *will affect* `run_all.py` as well.
+Changing these URLs *__will affect__* `run_all.py` as well.

@@ -41,35 +41,46 @@ jobs:
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
-      - name: Get the version
+      - name: Get the GH Release version
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
         shell: bash
-      - name: Download autologin OS image zip
+
+      - name: Download autologin OS image
         uses: actions/download-artifact@v2
-        id: download-zip
+        id: download-zip-autologin
         with:
           name: raspberry-pi-os-autologin-img
-      - name: Download autologin + ssh OS image zip
-        uses: actions/download-artifact@v2
-        id: download-zip
-        with:
-          name: raspberry-pi-os-autologin-img
-      - name: Upload autologin image release asset
+      - run: ls ${{steps.download-zip-autologin.outputs.download-path}}
+      - name: Zip again
+        run: |
+          cd ${{steps.download-zip-autologin.outputs.download-path}}
+          zip -r raspberry-pi-os-lite-${{ steps.get_version.outputs.VERSION }}-autologin.zip ./*
+      - name: Upload autologin OS image as release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{github.event.release.upload_url}}
-          asset_path: ${{steps.download-zip.outputs.download-path}}
-          asset_name: raspberry-pi-os-${{ steps.get_version.outputs.VERSION }}-autologin-img.zip
+          asset_path: raspberry-pi-os-lite-${{ steps.get_version.outputs.VERSION }}-autologin.zip
+          asset_name: raspberry-pi-os-lite-${{ steps.get_version.outputs.VERSION }}-autologin.zip
           asset_content_type: application/zip
-      - name: Upload autologin + ssh image release asset
+
+      - name: Download autologin + ssh OS image
+        uses: actions/download-artifact@v2
+        id: download-zip-autologin-ssh
+        with:
+          name: raspberry-pi-os-autologin-img
+      - name: Zip again
+        run: |
+          cd ${{steps.download-zip-autologin-ssh.outputs.download-path}}
+          zip -r raspberry-pi-os-lite-${{ steps.get_version.outputs.VERSION }}-autologin-ssh.zip ./*
+      - name: Upload autologin + ssh OS image as release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{github.event.release.upload_url}}
-          asset_path: ${{steps.download-zip.outputs.download-path}}
-          asset_name: raspberry-pi-os-${{ steps.get_version.outputs.VERSION }}-autologin-img.zip
+          asset_path: raspberry-pi-os-lite-${{ steps.get_version.outputs.VERSION }}-autologin-ssh.zip
+          asset_name: raspberry-pi-os-lite-${{ steps.get_version.outputs.VERSION }}-autologin-ssh.zip
           asset_content_type: application/zip
