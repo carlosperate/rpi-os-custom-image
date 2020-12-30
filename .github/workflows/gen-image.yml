@@ -71,7 +71,7 @@ jobs:
         uses: actions/download-artifact@v2
         id: download-zip-autologin-ssh
         with:
-          name: raspberry-pi-os-autologin-img
+          name: raspberry-pi-os-autologin-ssh-img
           path: autologin-ssh
       - name: Zip image again
         run: |
