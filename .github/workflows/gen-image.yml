@@ -11,8 +11,10 @@ on:
 jobs:
   gen-image:
     runs-on: ubuntu-latest
-    name: Generate autologin image
+    name: Generate custom images
     steps:
+      - name: Install qemu-img
+        run: sudo apt-get install -y qemu-utils
       - uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -20,7 +22,7 @@ jobs:
           python-version: "3.8"
       - name: Install Python dependencies
         run: pip install -r requirements.txt
-      - name: Run script
+      - name: Download official image and create custom images
         run: python run_all.py
       - name: Upload autologin image
         uses: actions/upload-artifact@v2
@@ -33,6 +35,12 @@ jobs:
         with:
           name: raspberry-pi-os-autologin-ssh-img
           path: rpiosimage/*-autologin-ssh.img
+          if-no-files-found: error
+      - name: Upload Mu image
+        uses: actions/upload-artifact@v2
+        with:
+          name: raspberry-pi-os-mu
+          path: rpiosimage/*-mu.img
           if-no-files-found: error
 
   release-asset:
@@ -86,4 +94,25 @@ jobs:
           upload_url: ${{github.event.release.upload_url}}
           asset_path: ${{steps.download-zip-autologin-ssh.outputs.download-path}}/raspberry-pi-os-lite-${{ steps.get_version.outputs.VERSION }}-autologin-ssh.zip
           asset_name: raspberry-pi-os-lite-${{ steps.get_version.outputs.VERSION }}-autologin-ssh.zip
+          asset_content_type: application/zip
+
+      - name: Download Mu image
+        uses: actions/download-artifact@v2
+        id: download-zip-mu
+        with:
+          name: raspberry-pi-os-mu
+          path: mu
+      - name: Zip image again
+        run: |
+          cd ${{steps.download-zip-mu.outputs.download-path}}
+          ls
+          zip -r raspberry-pi-os-lite-${{ steps.get_version.outputs.VERSION }}-mu.zip ./*
+      - name: Upload Mu image as release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{github.event.release.upload_url}}
+          asset_path: ${{steps.download-zip-mu.outputs.download-path}}/raspberry-pi-os-lite-${{ steps.get_version.outputs.VERSION }}-mu.zip
+          asset_name: raspberry-pi-os-lite-${{ steps.get_version.outputs.VERSION }}-mu.zip
           asset_content_type: application/zip

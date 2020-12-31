@@ -8,11 +8,11 @@ CI testing with https://github.com/carlosperate/docker-qemu-rpi-os.
 Currently the following images are being created:
 - Raspberry Pi OS Lite + autologin enabled
 - Raspberry Pi OS Lite + autologin + ssh enabled
+- Raspberry Pi OS Lite + autologin + ssh + resized image (+1GB) + specific app dependencies
+    - This is a special case image for doing CI testing on personal projects
 
 Other upcoming images:
 - Raspberry Pi OS Lite + autologin + ssh + resized image (+1GB)
-- Raspberry Pi OS Lite + autologin + ssh + resized image (+1GB) + specific app dependencies
-    - This is a special case image for doing CI testing on personal projects
 
 
 ## How does it work
@@ -35,6 +35,7 @@ In this case all is encapsulated in a Python script:
 Requirements:
 - Linux or macOS (it uses `expect`)
 - Docker
+- QEMU utils
 - Python 3
 - An internet connection while the Python script is running
 

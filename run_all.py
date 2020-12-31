@@ -7,6 +7,7 @@ import shutil
 
 import download_os
 import customise_os
+import customise_os_mu
 
 
 def main():
@@ -27,6 +28,11 @@ def main():
     customise_os.run_edits(
         autologin_ssh_img, needs_login=True, autologin=True, ssh=True
     )
+
+    # Create a copy and configure image with autologin + ssh
+    mu_img = img_path.replace(".img", "-mu.img")
+    shutil.copyfile(img_path, mu_img)
+    customise_os_mu.run_edits(mu_img, needs_login=True)
 
 
 if __name__ == "__main__":

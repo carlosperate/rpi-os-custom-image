@@ -13,7 +13,8 @@ import pexpect
 
 # If this script is run on its own, select here what features to update
 AUTOLOGIN = True
-SSH = True
+SSH = False
+EXPAND_FS = False
 
 # Configuration data end
 ###############################################################################
@@ -103,7 +104,12 @@ def enable_ssh(child):
     child.expect_exact(BASH_PROMPT)
 
 
-def run_edits(img_path, needs_login=True, autologin=None, ssh=None):
+def expand_root_fs(child):
+    child.sendline("sudo raspi-config --expand-rootfs")
+    child.expect_exact(BASH_PROMPT)
+
+
+def run_edits(img_path, needs_login=True, autologin=None, ssh=None, expand_fs=None):
     print("Staring Raspberry Pi OS customisation: {}".format(img_path))
     try:
         child, docker_container_name = launch_docker_spawn(img_path)
@@ -113,6 +119,8 @@ def run_edits(img_path, needs_login=True, autologin=None, ssh=None):
             enable_autologin(child)
         if ssh or (ssh is None and SSH):
             enable_ssh(child)
+        if expand_fs or (expand_fs is None and EXPAND_FS):
+            expand_root_fs(child)
         # We are done, let's exit
         child.sendline("sudo shutdown now")
         child.expect(pexpect.EOF)
