@@ -22,8 +22,10 @@ def install_mu_apt_dependencies(child):
     child.sendline("sudo apt-get update -qq")
     child.expect_exact(customise_os.BASH_PROMPT)
     # Break down the install in multiple commands to kee the time per command low 
-    child.sendline("sudo apt-get install -y git xvfb python3-pip")
+    child.sendline("sudo apt-get install -y xvfb")
     child.expect_exact(customise_os.BASH_PROMPT, timeout=15*60)
+    child.sendline("sudo apt-get install -y git python3-pip")
+    child.expect_exact(customise_os.BASH_PROMPT)
     child.sendline("sudo apt-get install -y python3-pyqt5 python3-pyqt5.qtserialport")
     child.expect_exact(customise_os.BASH_PROMPT)
     child.sendline("sudo apt-get install -y python3-pyqt5.qsci python3-pyqt5.qtsvg")
