@@ -105,8 +105,19 @@ def enable_ssh(child):
 
 
 def expand_root_fs(child):
-    child.sendline("sudo raspi-config --expand-rootfs")
+    # Temporary solution for older Raspbian issue: sda2 is not on SD card. Don't know how to expand
+    # https://www.raspberrypi.org/forums/viewtopic.php?t=44856#p563673
+    child.sendline("sed -e 's/mmcblk0p/sda/' -e 's/mmcblk0/sda/' /usr/bin/raspi-config > ~/raspi-config")
     child.expect_exact(BASH_PROMPT)
+    child.sendline("chmod +x ~/raspi-config")
+    child.expect_exact(BASH_PROMPT)
+    child.sendline("sudo ~/raspi-config --expand-rootfs")
+    child.expect_exact(BASH_PROMPT)
+    child.sendline("rm ~/raspi-config")
+    child.expect_exact(BASH_PROMPT)
+    # end of old solution
+    #child.sendline("sudo raspi-config --expand-rootfs")
+    #child.expect_exact(BASH_PROMPT)
 
 
 def run_edits(img_path, needs_login=True, autologin=None, ssh=None, expand_fs=None):
