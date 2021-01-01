@@ -12,9 +12,8 @@ import requests
 
 # URL of the Raspberry Pi OS Lite zip file to download and check
 # Find options in https://downloads.raspberrypi.org/raspios_lite_armhf/images/
-OS_IMAGE_ZIP = "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2020-08-24/2020-08-20-raspios-buster-armhf-lite.zip"
-OS_IMAGE_SHA = "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2020-08-24/2020-08-20-raspios-buster-armhf-lite.zip.sha256"
-OS_IMAGE_SHA_TYPE = "256"
+OS_IMAGE_ZIP = "https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2017-07-05/2017-07-05-raspbian-jessie-lite.zip"
+ZIP_SHA_256  = "https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2017-07-05/2017-07-05-raspbian-jessie-lite.zip.sha256"
 
 # Configuration data end
 ###############################################################################

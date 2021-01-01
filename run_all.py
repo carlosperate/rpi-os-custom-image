@@ -30,16 +30,16 @@ def main():
     )
 
     # Create a copy and configure image with autologin + ssh + expanded filesystem
-    autologin_ssh_img = img_path.replace(".img", "-autologin-ssh-expanded.img")
-    shutil.copyfile(img_path, autologin_ssh_img)
-    customise_os.run_edits(
-        autologin_ssh_img, needs_login=True, autologin=True, ssh=True, expand_fs=True
-    )
+    #autologin_ssh_img = img_path.replace(".img", "-autologin-ssh-expanded.img")
+    #shutil.copyfile(img_path, autologin_ssh_img)
+    #customise_os.run_edits(
+    #    autologin_ssh_img, needs_login=True, autologin=True, ssh=True, expand_fs=True
+    #)
 
     # Create a copy and configure image with autologin + ssh
-    mu_img = img_path.replace(".img", "-mu.img")
-    shutil.copyfile(autologin_ssh_img, mu_img)
-    customise_os_mu.run_edits(mu_img, needs_login=False)
+    #mu_img = img_path.replace(".img", "-mu.img")
+    #shutil.copyfile(autologin_ssh_img, mu_img)
+    #customise_os_mu.run_edits(mu_img, needs_login=False)
 
 
 if __name__ == "__main__":
