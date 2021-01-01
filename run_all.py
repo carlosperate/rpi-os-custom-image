@@ -19,20 +19,27 @@ def main():
     autologin_img = img_path.replace(".img", "-autologin.img")
     shutil.copyfile(img_path, autologin_img)
     customise_os.run_edits(
-        autologin_img, needs_login=True, autologin=True, ssh=False
+        autologin_img, needs_login=True, autologin=True, ssh=False, expand_fs=False
     )
 
     # Create a copy and configure image with autologin + ssh
     autologin_ssh_img = img_path.replace(".img", "-autologin-ssh.img")
     shutil.copyfile(img_path, autologin_ssh_img)
     customise_os.run_edits(
-        autologin_ssh_img, needs_login=True, autologin=True, ssh=True
+        autologin_ssh_img, needs_login=True, autologin=True, ssh=True, expand_fs=False
+    )
+
+    # Create a copy and configure image with autologin + ssh + expanded filesystem
+    autologin_ssh_img = img_path.replace(".img", "-autologin-ssh-expanded.img")
+    shutil.copyfile(img_path, autologin_ssh_img)
+    customise_os.run_edits(
+        autologin_ssh_img, needs_login=True, autologin=True, ssh=True, expand_fs=True
     )
 
     # Create a copy and configure image with autologin + ssh
     mu_img = img_path.replace(".img", "-mu.img")
-    shutil.copyfile(img_path, mu_img)
-    customise_os_mu.run_edits(mu_img, needs_login=True)
+    shutil.copyfile(autologin_ssh_img, mu_img)
+    customise_os_mu.run_edits(mu_img, needs_login=False)
 
 
 if __name__ == "__main__":

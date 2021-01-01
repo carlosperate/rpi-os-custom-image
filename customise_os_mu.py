@@ -41,16 +41,14 @@ def install_mu_apt_dependencies(child):
 
 
 def run_edits(img_path, needs_login=True):
-    print("Staring Raspberry Pi OS customisation: {}".format(img_path))
-    print(pexpect.run("qemu-img resize {} +1G".format(img_path)))
-
-    customise_os.run_edits(
-        img_path, needs_login=True, autologin=True, ssh=True, expand_fs=True
-    )
+    print("Staring Raspberry Pi OS Mu customisation: {}".format(img_path))
 
     try:
         child, docker_container_name = customise_os.launch_docker_spawn(img_path)
-        child.expect_exact(customise_os.BASH_PROMPT)
+        if needs_login:
+            customise_os.login(child)
+        else:
+            child.expect_exact(customise_os.BASH_PROMPT)
         install_mu_apt_dependencies(child)
         # We are done, let's exit
         child.sendline("sudo shutdown now")

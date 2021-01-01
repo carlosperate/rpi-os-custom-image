@@ -111,6 +111,11 @@ def expand_root_fs(child):
 
 def run_edits(img_path, needs_login=True, autologin=None, ssh=None, expand_fs=None):
     print("Staring Raspberry Pi OS customisation: {}".format(img_path))
+
+    # Increase the image by 1 GB using qemu-img
+    if expand_fs or (expand_fs is None and EXPAND_FS):
+        print(pexpect.run("qemu-img resize {} +1G".format(img_path)))
+
     try:
         child, docker_container_name = launch_docker_spawn(img_path)
         if needs_login:
