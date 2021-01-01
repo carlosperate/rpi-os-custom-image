@@ -23,14 +23,13 @@ def install_mu_apt_dependencies(child):
     child.expect_exact(customise_os.BASH_PROMPT)
     # Break down the install in multiple commands to kee the time per command low 
     child.sendline("sudo apt-get install -y git xvfb python3-pip")
+    child.expect_exact(customise_os.BASH_PROMPT, timeout=15*60)
+    child.sendline("sudo apt-get install -y python3-pyqt5 python3-pyqt5.qtserialport")
     child.expect_exact(customise_os.BASH_PROMPT)
-    child.sendline(
-        "sudo apt-get install -y python3-pyqt5 python3-pyqt5.qtserialport"
-    )
+    child.sendline("sudo apt-get install -y python3-pyqt5.qsci python3-pyqt5.qtsvg")
     child.expect_exact(customise_os.BASH_PROMPT)
-    child.sendline(
-        "sudo apt-get install -y python3-pyqt5.qsci python3-pyqt5.qtsvg python3-pyqt5.qtchart"
-    )
+    # Older versions of Raspbian do not have QtChart
+    child.sendline("sudo apt-get install -y python3-pyqt5.qtchart")
     child.expect_exact(customise_os.BASH_PROMPT)
     child.sendline(
         "sudo apt-get install -y libxmlsec1-dev libxml2 libxml2-dev libxkbcommon-x11-0 libatlas-base-dev"
