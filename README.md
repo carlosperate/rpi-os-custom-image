@@ -4,15 +4,19 @@ Minimally customised Raspberry Pi OS images.
 
 The main reason these have been created is to be able to run them in automated
 CI testing with https://github.com/carlosperate/docker-qemu-rpi-os.
+But they can also be used like normal OS images in a physical Raspberry Pi, or
+any other emulation method.
 
 Currently the following images are being created:
 - Raspberry Pi OS Lite + autologin enabled
 - Raspberry Pi OS Lite + autologin + ssh enabled
+- Raspberry Pi OS Lite + autologin + ssh + resized image (+1GB)
 - Raspberry Pi OS Lite + autologin + ssh + resized image (+1GB) + specific app dependencies
     - This is a special case image for doing CI testing on personal projects
 
-Other upcoming images:
-- Raspberry Pi OS Lite + autologin + ssh + resized image (+1GB)
+These customised images have been generated from different versions of
+Raspbian/Raspberry Pi OS and all can be found and downloaded from the
+[GH Releases page](https://github.com/carlosperate/rpi-os-custom-image/releases/tag/2020-05-28).
 
 
 ## How does it work
@@ -23,20 +27,20 @@ https://www.hardill.me.uk/wordpress/2020/02/21/building-custom-raspberry-pi-sd-c
 In this case all is encapsulated in a Python script:
 - Download an official Raspberry Pi OS Lite image
 - Uncompress it
+- When required the .img size is increased with `qemu-img`
 - Load the .img in QEMU using the Docker images provided by
   [dockerpi](https://github.com/lukechilds/dockerpi/)
 - Use the [Pexpect(https://pexpect.readthedocs.io) library to interact with
   the Raspberry Pi OS terminal and configure everything necessary
-- Zip the image for release
 
 
 ## How to run this project
 
 Requirements:
 - Linux or macOS (it uses `expect`)
-- Docker
-- QEMU utils
-- Python 3
+- [Docker](https://www.docker.com/products/docker-desktop)
+- [QEMU utils](https://www.qemu.org/download/)
+- [Python 3](https://www.python.org/downloads/)
 - An internet connection while the Python script is running
 
 Install the Python dependencies (much better in a virtual environment):
@@ -53,7 +57,7 @@ python run_all.py
 ### Change default options
 
 Ideally the options should be selectable via command line arguments, but
-until that is implemented there are other options in the meantime.
+until that is implemented there are other way to change the defaults.
 
 #### OS customisation options
 
@@ -77,6 +81,7 @@ modify:
 # If this script is run on its own, select here what features to update
 AUTOLOGIN = True
 SSH = True
+EXPAND_FS = False
 
 # Configuration data end
 ###############################################################################
