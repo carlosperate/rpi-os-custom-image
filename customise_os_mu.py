@@ -27,7 +27,7 @@ def install_mu_apt_dependencies(child):
     child.sendline("sudo apt-get install -y git python3-pip")
     child.expect_exact(customise_os.BASH_PROMPT)
     child.sendline("sudo apt-get install -y python3-pyqt5 python3-pyqt5.qtserialport")
-    child.expect_exact(customise_os.BASH_PROMPT)
+    child.expect_exact(customise_os.BASH_PROMPT, timeout=15*60)
     child.sendline("sudo apt-get install -y python3-pyqt5.qsci python3-pyqt5.qtsvg")
     child.expect_exact(customise_os.BASH_PROMPT)
     # Older versions of Raspbian do not have QtChart
