@@ -15,30 +15,30 @@ def main():
     zip_path = download_os.download_image_zip()
     img_path = download_os.unzip_image(zip_path)
 
-    # Create a copy and configure image with autologin
+    # Create a copy of the original image and configure it with autologin
     autologin_img = img_path.replace(".img", "-autologin.img")
     shutil.copyfile(img_path, autologin_img)
     customise_os.run_edits(
         autologin_img, needs_login=True, autologin=True, ssh=False, expand_fs=False
     )
 
-    # Create a copy and configure image with autologin + ssh
+    # Create a copy of the original image and configure it autologin + ssh
     autologin_ssh_img = img_path.replace(".img", "-autologin-ssh.img")
     shutil.copyfile(img_path, autologin_ssh_img)
     customise_os.run_edits(
         autologin_ssh_img, needs_login=True, autologin=True, ssh=True, expand_fs=False
     )
 
-    # Create a copy and configure image with autologin + ssh + expanded filesystem
-    autologin_ssh_img = img_path.replace(".img", "-autologin-ssh-expanded.img")
-    shutil.copyfile(img_path, autologin_ssh_img)
+    # Copy original image and configure it autologin + ssh + expanded filesystem
+    autologin_ssh_fs_img = img_path.replace(".img", "-autologin-ssh-expanded.img")
+    shutil.copyfile(img_path, autologin_ssh_fs_img)
     customise_os.run_edits(
-       autologin_ssh_img, needs_login=True, autologin=True, ssh=True, expand_fs=True
+       autologin_ssh_fs_img, needs_login=True, autologin=True, ssh=True, expand_fs=True
     )
 
-    # Create a copy and configure image with autologin + ssh
+    # Copy expanded image (last one created) and install Mu dependencies
     mu_img = img_path.replace(".img", "-mu.img")
-    shutil.copyfile(autologin_ssh_img, mu_img)
+    shutil.copyfile(autologin_ssh_fs_img, mu_img)
     customise_os_mu.run_edits(mu_img, needs_login=False)
 
 
