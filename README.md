@@ -12,11 +12,11 @@ Currently the following images are being created:
 - Raspberry Pi OS Lite + autologin + ssh enabled
 - Raspberry Pi OS Lite + autologin + ssh + resized image (+1GB)
 - Raspberry Pi OS Lite + autologin + ssh + resized image (+1GB) + specific app dependencies
-    - This is a special case image for doing CI testing on personal projects
+    - This is a special image for doing CI testing on a personal project
 
 These customised images have been generated from different versions of
 Raspbian/Raspberry Pi OS and all can be found and downloaded from the
-[GH Releases page](https://github.com/carlosperate/rpi-os-custom-image/releases/tag/2020-05-28).
+[GH Releases page](https://github.com/carlosperate/rpi-os-custom-image/releases/).
 
 
 ## How does it work
@@ -30,14 +30,14 @@ In this case all is encapsulated in a Python script:
 - When required the .img size is increased with `qemu-img`
 - Load the .img in QEMU using the Docker images provided by
   [dockerpi](https://github.com/lukechilds/dockerpi/)
-- Use the [Pexpect(https://pexpect.readthedocs.io) library to interact with
+- Use the [Pexpect](https://pexpect.readthedocs.io) library to interact with
   the Raspberry Pi OS terminal and configure everything necessary
 
 
 ## How to run this project
 
 Requirements:
-- Linux or macOS (it uses `expect`)
+- Linux or macOS (it uses the `expect` command)
 - [Docker](https://www.docker.com/products/docker-desktop)
 - [QEMU utils](https://www.qemu.org/download/)
 - [Python 3](https://www.python.org/downloads/)
@@ -57,7 +57,8 @@ python run_all.py
 ### Change default options
 
 Ideally the options should be selectable via command line arguments, but
-until that is implemented there are other way to change the defaults.
+until that is implemented the defaults can be changed in the source code
+global variables.
 
 #### OS customisation options
 
@@ -94,7 +95,6 @@ These options do not affect `run_all.py` runs, only `customise_os.py`.
 You can run the `download_os.py` Python script directly if you'd like to
 download an unzip a different Raspberry Pi OS image.
 
-
 The URL should be passed as a command line argument:
 
 ```
@@ -118,7 +118,6 @@ default:
 # Find options in https://downloads.raspberrypi.org/raspios_lite_armhf/images/
 OS_IMAGE_ZIP = "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2020-08-24/2020-08-20-raspios-buster-armhf-lite.zip"
 OS_IMAGE_SHA = "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2020-08-24/2020-08-20-raspios-buster-armhf-lite.zip.sha256"
-OS_IMAGE_SHA_TYPE = "256"
 
 # Configuration data end
 ###############################################################################
