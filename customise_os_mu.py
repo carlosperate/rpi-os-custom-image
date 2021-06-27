@@ -52,25 +52,7 @@ def run_edits(img_path, needs_login=True):
         child.wait()
     # Let ay exceptions bubble up, but ensure clean-up is run
     finally:
-        try:
-            print('! Attempting to close process.')
-            child.close()
-            print("! Exit status: {}".format(child.exitstatus))
-            print("! Signal status: {}".format(child.signalstatus))
-        finally:
-            print('! Check if {} container is still running'.format(docker_container_name))
-            container_id = pexpect.run(
-                'docker ps --filter "name={}" -q'.format(docker_container_name),
-            )
-            print(container_id)
-            if container_id:
-                print('! Stopping {} container'.format(docker_container_name))
-                cmd_op, exit_status  = pexpect.run(
-                    'docker stop {}'.format(docker_container_name), withexitstatus=True,
-                )
-                print("{}\n! Exit status: {}".format(cmd_op, exit_status))
-            else:
-                print('! Docker container was already stopped.')
+        customise_os.close_container(child, docker_container_name)
 
 
 if __name__ == "__main__":
