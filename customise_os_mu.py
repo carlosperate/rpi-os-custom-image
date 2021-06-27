@@ -1,15 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Run a Raspberry PI OS image with Docker and QEMU to add:
-- Autologin
-- SSH
-- Larger disk space
-- Installed the Mu apt packages
+Run a Raspberry PI OS image with Docker to install Mu Editor specific
+apt packages.
 """
-import os
 import sys
-import uuid
 
 import pexpect
 
@@ -30,7 +25,7 @@ def install_mu_apt_dependencies(child):
     child.expect_exact(customise_os.BASH_PROMPT, timeout=15*60)
     child.sendline("sudo apt-get install -y python3-pyqt5.qsci python3-pyqt5.qtsvg")
     child.expect_exact(customise_os.BASH_PROMPT)
-    # Older versions of Raspbian do not have QtChart
+    # Older versions of Raspbian might not have QtChart
     child.sendline("sudo apt-get install -y python3-pyqt5.qtchart")
     child.expect_exact(customise_os.BASH_PROMPT)
     child.sendline(

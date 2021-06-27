@@ -125,6 +125,7 @@ def run_edits(img_path, needs_login=True, autologin=None, ssh=None, expand_fs=No
 
     # Increase the image by 1 GB using qemu-img
     if expand_fs or (expand_fs is None and EXPAND_FS):
+        print("Expanding {} image +1GB:".format(img_path))
         print(pexpect.run("qemu-img resize {} +1G".format(img_path)))
 
     try:
