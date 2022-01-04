@@ -12,8 +12,10 @@ import requests
 
 # URL of the Raspberry Pi OS Lite zip file to download and check
 # Find options in https://downloads.raspberrypi.org/raspios_lite_armhf/images/
-OS_IMAGE_ZIP = "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2021-05-28/2021-05-07-raspios-buster-armhf-lite.zip"
-ZIP_SHA_256  = "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2021-05-28/2021-05-07-raspios-buster-armhf-lite.zip.sha256"
+# Legacy version in https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/
+# Legacy info https://www.raspberrypi.com/news/new-old-functionality-with-raspberry-pi-os-legacy/
+OS_IMAGE_ZIP = "https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/raspios_oldstable_lite_armhf-2021-12-02/2021-12-02-raspios-buster-armhf-lite.zip"
+ZIP_SHA_256  = "https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/raspios_oldstable_lite_armhf-2021-12-02/2021-12-02-raspios-buster-armhf-lite.zip.sha256"
 
 # Configuration data end
 ###############################################################################
