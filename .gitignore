@@ -2,6 +2,7 @@
 # Project #
 ###########
 rpiosimage/*
+.venv/
 
 ###########
 # Editors #
