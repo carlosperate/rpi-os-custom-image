@@ -4,7 +4,10 @@
 import os
 import sys
 import lzma
+import hashlib
+from typing import Optional
 from zipfile import ZipFile
+from collections import namedtuple
 
 import requests
 
@@ -26,39 +29,57 @@ IMAGE_SAVE_LOCATION = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "rpiosimage"
 )
 
+# NamedTuple of a img URL and its SHA256 hash
+ImageURL = namedtuple("ImageURL", ["url", "sha256_url"])
+DEFAULT_IMAGE_URL = ImageURL(url=OS_IMAGE_ZIP, sha256_url=ZIP_SHA_256)
 
-def download_image_zip(file_url=OS_IMAGE_ZIP):
-    """Download a zip image from the internet.
 
-    :param file_url: URL to the zip file to download.
-    :return: Absolute path to the downloaded zip file.
+def download_compressed_image(img: ImageURL = DEFAULT_IMAGE_URL) -> str:
+    """Download a compressed image from the internet.
+
+    :param img: URL to the compressed file and sha256 to download.
+    :return: Absolute path to the downloaded compressed file.
     """
-    print("Downloading OS image: {}".format(file_url))
+    print("Downloading OS image: {}".format(img.url))
 
-    if not file_url.startswith("http") or \
-        (not file_url.endswith(".zip") and not file_url.endswith(".xz")):
+    if not img.url.startswith("http") or \
+        (not img.url.endswith(".zip") and not img.url.endswith(".xz")):
         raise Exception("Provided URL must be a zip/xz file.")
 
     if not os.path.exists(IMAGE_SAVE_LOCATION):
         os.makedirs(IMAGE_SAVE_LOCATION)
-    compressed_img_filename = os.path.join(IMAGE_SAVE_LOCATION, file_url.split('/')[-1])
+    compressed_img_filename = os.path.join(IMAGE_SAVE_LOCATION, img.url.split('/')[-1])
 
-    response = requests.get(file_url, stream=True)
-    if response.status_code == 200:
-        with open(compressed_img_filename, 'wb') as f:
-            for i, chunk in enumerate(response.iter_content(chunk_size=10*1024*1024)):
-                if chunk:
-                    print("\t-> Downloaded {}0MB...".format(i), end='\r')
-                    f.write(chunk)
-            print("Download done!                  ")
-    else:
+    response = requests.get(img.url, stream=True)
+    if response.status_code != 200:
         raise Exception("Could not reach the file URL, error code {}: {}".format(
-            response.status_code, file_url
+            response.status_code, img.url
         ))
+    with open(compressed_img_filename, 'wb') as f:
+        for i, chunk in enumerate(response.iter_content(chunk_size=10*1024*1024)):
+            if chunk:
+                print("\t-> Downloaded {}0MB...".format(i), end='\r')
+                f.write(chunk)
+    print("\nDownload done!                  ")
+
+    print("Verifying SHA256 hash...  ", end="")
+    with open(compressed_img_filename, 'rb') as img_f:
+        img_data = img_f.read()
+    response = requests.get(img.sha256_url)
+    if response.status_code != 200:
+        raise Exception("Could not reach the SHA256 file URL, error code {}: {}".format(
+            response.status_code, img.sha256_url
+        ))
+    sha_hash = response.text.split()[0]
+    print(sha_hash)
+    if sha_hash != hashlib.sha256(img_data).hexdigest():
+        raise Exception("SHA256 hash does not match the file.")
+    print("SHA256 hash verified!")
+
     return os.path.abspath(compressed_img_filename)
 
 
-def decompress_image(compressed_path):
+def decompress_image(compressed_path: str) -> str:
     """Decompress a file with a img file inside.
 
     :param compressed_path: Path to the zip or xz file to decompress.
@@ -90,12 +111,12 @@ def decompress_image(compressed_path):
     return img_path
 
 
-def main(img_zip_url=None):
-    compressed_path = download_image_zip(img_zip_url)
+def main(img_zip_url: Optional[ImageURL] = None):
+    compressed_path = download_compressed_image(img_zip_url)
     img_path = decompress_image(compressed_path)
     return 0
 
 
 if __name__ == "__main__":
     # We only use the first argument to receive a URL to the .img file
-    sys.exit(main(sys.argv[1] if len(sys.argv) > 1 else OS_IMAGE_ZIP))
+    sys.exit(main(sys.argv[1] if len(sys.argv) > 1 else DEFAULT_IMAGE_URL))
