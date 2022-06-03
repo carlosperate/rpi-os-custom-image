@@ -12,8 +12,8 @@ import customise_os_mu
 
 def main():
     # Download and unzip OS image
-    zip_path = download_os.download_image_zip()
-    img_path = download_os.unzip_image(zip_path)
+    compressed_path = download_os.download_image_zip()
+    img_path = download_os.decompress_image(compressed_path)
 
     # Create a copy of the original image and configure it with autologin
     autologin_img = img_path.replace(".img", "-autologin.img")
