@@ -16,11 +16,11 @@ import requests
 # Configuration data start
 
 # URL of the Raspberry Pi OS Lite zip file to download and check
-# Find options in https://downloads.raspberrypi.org/raspios_lite_armhf/images/
-# Legacy version in https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/
+# Find Bullseye options in https://downloads.raspberrypi.org/raspios_lite_armhf/images/
+# Buster Legacy version in https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/
 # Legacy info https://www.raspberrypi.com/news/new-old-functionality-with-raspberry-pi-os-legacy/
-OS_IMAGE_ZIP = "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2022-01-28/2022-01-28-raspios-bullseye-armhf-lite.zip"
-ZIP_SHA_256  = "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2022-01-28/2022-01-28-raspios-bullseye-armhf-lite.zip.sha256"
+OS_IMAGE_ZIP = "https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/raspios_oldstable_lite_armhf-2022-04-07/2022-04-04-raspios-buster-armhf-lite.img.xz"
+ZIP_SHA_256  = "https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/raspios_oldstable_lite_armhf-2022-04-07/2022-04-04-raspios-buster-armhf-lite.img.xz.sha256"
 
 # Configuration data end
 ###############################################################################
