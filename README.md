@@ -36,11 +36,32 @@ In this case all is encapsulated in a Python script:
 
 ## How to run this project
 
+### Docker
+
+First build the Docker image with all the dependencies installed.
+
+```
+docker build -t "rpi-os-imager" .
+```
+
+Then to run these scripts, as they themselves run Docker, need Docker to be
+launched with configuration flags to use Docker Out of Docker (DooD).
+
+From the root directory of this repository:
+```
+docker run --rm -v $(pwd):$(pwd) -w $(pwd) -v /var/run/docker.sock:/var/run/docker.sock rpi-os-imager python run_all.py
+```
+
+### Local
+
 Requirements:
 - Linux or macOS (it uses the `expect` command)
 - [Docker](https://www.docker.com/products/docker-desktop)
 - [QEMU utils](https://www.qemu.org/download/)
 - [Python 3](https://www.python.org/downloads/)
+- [OpenSSL](https://www.openssl.org)
+- [fdisk](https://en.wikipedia.org/wiki/Fdisk)
+- [mtools](https://www.gnu.org/software/mtools/)
 - An internet connection while the Python script is running
 
 Install the Python dependencies (much better in a virtual environment):
