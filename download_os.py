@@ -15,12 +15,8 @@ import requests
 ###############################################################################
 # Configuration data start
 
-# URL of the Raspberry Pi OS Lite zip file to download and check
-# Find Bullseye options in https://downloads.raspberrypi.org/raspios_lite_armhf/images/
-# Buster Legacy version in https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/
-# Legacy info https://www.raspberrypi.com/news/new-old-functionality-with-raspberry-pi-os-legacy/
-OS_IMAGE_ZIP = "https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/raspios_oldstable_lite_armhf-2022-04-07/2022-04-04-raspios-buster-armhf-lite.img.xz"
-ZIP_SHA_256  = "https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/raspios_oldstable_lite_armhf-2022-04-07/2022-04-04-raspios-buster-armhf-lite.img.xz.sha256"
+DEFAULT_IMG_RELEASE = "buster-legacy"
+DEFAULT_IMG_VERSION = "2022-04-07"
 
 # Configuration data end
 ###############################################################################
@@ -31,7 +27,74 @@ IMAGE_SAVE_LOCATION = os.path.join(
 
 # NamedTuple of a img URL and its SHA256 hash
 ImageURL = namedtuple("ImageURL", ["url", "sha256_url"])
-DEFAULT_IMAGE_URL = ImageURL(url=OS_IMAGE_ZIP, sha256_url=ZIP_SHA_256)
+
+
+
+# URL of the Raspberry Pi OS Lite zip file to download and check
+# Find Bullseye options in https://downloads.raspberrypi.org/raspios_lite_armhf/images/
+# Buster Legacy version in https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/
+# Legacy info https://www.raspberrypi.com/news/new-old-functionality-with-raspberry-pi-os-legacy/
+OS_IMGS = {
+    "bullseye" : {
+        "2022-04-07": ImageURL(
+            url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2022-04-07/2022-04-04-raspios-bullseye-armhf-lite.img.xz",
+            sha256_url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2022-04-07/2022-04-04-raspios-bullseye-armhf-lite.img.xz.sha256",
+        ),
+        "2022-01-28": ImageURL(
+            url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2022-01-28/2022-01-28-raspios-bullseye-armhf-lite.zip",
+            sha256_url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2022-01-28/2022-01-28-raspios-bullseye-armhf-lite.zip.sha256",
+        ),
+        "2021-11-08": ImageURL(
+            url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2021-11-08/2021-10-30-raspios-bullseye-armhf-lite.zip",
+            sha256_url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2021-11-08/2021-10-30-raspios-bullseye-armhf-lite.zip.sha256",
+        ),
+    },
+    "buster-legacy": {
+        "2022-04-07": ImageURL(
+            url="https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/raspios_oldstable_lite_armhf-2022-04-07/2022-04-04-raspios-buster-armhf-lite.img.xz",
+            sha256_url="https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/raspios_oldstable_lite_armhf-2022-04-07/2022-04-04-raspios-buster-armhf-lite.img.xz.sha256",
+        ),
+        "2022-01-28": ImageURL(
+            url="https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/raspios_oldstable_lite_armhf-2022-01-28/2022-01-28-raspios-buster-armhf-lite.zip",
+            sha256_url="https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/raspios_oldstable_lite_armhf-2022-01-28/2022-01-28-raspios-buster-armhf-lite.zip.sha256",
+        ),
+        "2021-12-02": ImageURL(
+            url="https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/raspios_oldstable_lite_armhf-2021-12-02/2021-12-02-raspios-buster-armhf-lite.zip",
+            sha256_url="https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/raspios_oldstable_lite_armhf-2021-12-02/2021-12-02-raspios-buster-armhf-lite.zip.sha256",
+        ),
+    },
+    "buster": {
+        "2021-05-28": ImageURL(
+            url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2021-05-28/2021-05-07-raspios-buster-armhf-lite.zip",
+            sha256_url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2021-05-28/2021-05-07-raspios-buster-armhf-lite.zip.sha256",
+        ),
+        "2021-03-25": ImageURL(
+            url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2021-03-25/2021-03-04-raspios-buster-armhf-lite.zip",
+            sha256_url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2021-03-25/2021-03-04-raspios-buster-armhf-lite.zip.sha256",
+        ),
+        "2021-01-12": ImageURL(
+            url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2021-01-12/2021-01-11-raspios-buster-armhf-lite.zip",
+            sha256_url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2021-01-12/2021-01-11-raspios-buster-armhf-lite.zip.sha256",
+        ),
+        "2020-12-04": ImageURL(
+            url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2020-12-04/2020-12-02-raspios-buster-armhf-lite.zip",
+            sha256_url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2020-12-04/2020-12-02-raspios-buster-armhf-lite.zip.sha256",
+        ),
+        "2020-08-24": ImageURL(
+            url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2020-08-24/2020-08-20-raspios-buster-armhf-lite.zip",
+            sha256_url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2020-08-24/2020-08-20-raspios-buster-armhf-lite.zip.sha256",
+        ),
+        "2020-05-28": ImageURL(
+            url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2020-05-28/2020-05-27-raspios-buster-lite-armhf.zip",
+            sha256_url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2020-05-28/2020-05-27-raspios-buster-lite-armhf.zip.sha256",
+        ),
+        "2020-02-14": ImageURL(
+            url="https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2020-02-14/2020-02-13-raspbian-buster-lite.zip",
+            sha256_url="https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2020-02-14/2020-02-13-raspbian-buster-lite.zip.sha256",
+        )
+    }
+}
+DEFAULT_IMAGE_URL = OS_IMGS[DEFAULT_IMG_RELEASE][DEFAULT_IMG_VERSION]
 
 
 def download_compressed_image(img: ImageURL = DEFAULT_IMAGE_URL) -> str:
