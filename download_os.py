@@ -15,8 +15,8 @@ import requests
 ###############################################################################
 # Configuration data start
 
-DEFAULT_IMG_RELEASE = "bullseye"
-DEFAULT_IMG_VERSION = "2022-04-07"
+DEFAULT_IMG_RELEASE = "buster-legacy"
+DEFAULT_IMG_VERSION = "2022-09-07"
 
 # Configuration data end
 ###############################################################################
@@ -48,6 +48,10 @@ OS_IMGS = {
         ),
     },
     "buster-legacy": {
+        "2022-09-07": ImageURL(
+            url="https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/raspios_oldstable_lite_armhf-2022-09-07/2022-09-06-raspios-buster-armhf-lite.img.xz",
+            sha256_url="https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/raspios_oldstable_lite_armhf-2022-09-07/2022-09-06-raspios-buster-armhf-lite.img.xz.sha256",
+        ),
         "2022-04-07": ImageURL(
             url="https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/raspios_oldstable_lite_armhf-2022-04-07/2022-04-04-raspios-buster-armhf-lite.img.xz",
             sha256_url="https://downloads.raspberrypi.org/raspios_oldstable_lite_armhf/images/raspios_oldstable_lite_armhf-2022-04-07/2022-04-04-raspios-buster-armhf-lite.img.xz.sha256",
