@@ -39,6 +39,7 @@ def install_mu_apt_dependencies(child):
 def run_edits(img_path, needs_login=True):
     print("Staring Raspberry Pi OS Mu customisation: {}".format(img_path))
 
+    child, docker_container_name = None, None
     try:
         child, docker_container_name = customise_os.launch_docker_spawn(img_path)
         if needs_login:
@@ -52,7 +53,8 @@ def run_edits(img_path, needs_login=True):
         child.wait()
     # Let ay exceptions bubble up, but ensure clean-up is run
     finally:
-        customise_os.close_container(child, docker_container_name)
+        if child:
+            customise_os.close_container(child, docker_container_name)
 
 
 if __name__ == "__main__":

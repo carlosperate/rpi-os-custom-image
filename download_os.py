@@ -15,7 +15,7 @@ import requests
 ###############################################################################
 # Configuration data start
 
-DEFAULT_IMG_RELEASE = "buster-legacy"
+DEFAULT_IMG_RELEASE = "bullseye"
 DEFAULT_IMG_VERSION = "2022-04-07"
 
 # Configuration data end
@@ -27,8 +27,6 @@ IMAGE_SAVE_LOCATION = os.path.join(
 
 # NamedTuple of a img URL and its SHA256 hash
 ImageURL = namedtuple("ImageURL", ["url", "sha256_url"])
-
-
 
 # URL of the Raspberry Pi OS Lite zip file to download and check
 # Find Bullseye options in https://downloads.raspberrypi.org/raspios_lite_armhf/images/

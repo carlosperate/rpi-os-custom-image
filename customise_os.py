@@ -4,6 +4,8 @@
 import os
 import sys
 import uuid
+import time
+import subprocess
 
 import pexpect
 
@@ -36,9 +38,28 @@ ExecStart=-/sbin/agetty --autologin {} --keep-baud 115200,38400,9600 %I $TERM
 """.format(RPI_OS_USERNAME)
 
 
+def set_username_password(img_path, username=RPI_OS_USERNAME, password=RPI_OS_PASSWORD):
+    """Create the user and password in the Raspberry Pi OS image."""
+    cmds_to_run = [
+        # Create a userconf file with the username and encrypted password
+        f'echo -n "{username}:" >> userconf',
+        f'echo "{password}" | openssl passwd -6 -stdin | tee -a userconf',
+        # Workout the FAT32 boot filesystem offset (offset in bytes,
+        # fdisk info in sectors) and copy the userconf there
+        f"OFFSET=$(fdisk -lu {img_path} "
+            "| awk '/^Sector size/ {sector_size=$4} /FAT32 \(LBA\)/ {print $2 * sector_size}') && "
+            f"mcopy -o -i {img_path}" "@@${OFFSET} userconf ::/",
+        f"rm -d userconf",
+    ]
+
+    for cmd in cmds_to_run:
+        print(f"Running command: {cmd}")
+        subprocess.run(cmd, shell=True, check=True)
+
+
 def launch_docker_spawn(img_path):
-    """Creates a copy of the provided Raspberry Pi OS Lite image and runs it in
-    QEMU inside a Docker container to configure autologin.
+    """Runs the provided Raspberry Pi OS Lite image in QEMU inside a Docker
+    container and returns a child process to run commands inside it.
 
     :param img_path: Path to the Raspberry Pi OS Lite image to update.
     """
@@ -68,8 +89,14 @@ def launch_docker_spawn(img_path):
 
 def login(child):
     child.expect_exact("raspberrypi login: ")
+    # Since the 2022-04 bullseye release the first boot wizard creates an
+    # an account based on userconf.
+    # This first boot wizard runs in a different session as a different user,
+    # so sometimes it can take a while before it's able to create the user
+    time.sleep(90)
     child.sendline(RPI_OS_USERNAME)
     child.expect_exact("Password: ")
+    time.sleep(5)
     child.sendline(RPI_OS_PASSWORD)
     child.expect_exact(BASH_PROMPT)
 
@@ -145,11 +172,15 @@ def close_container(child, docker_container_name):
 def run_edits(img_path, needs_login=True, autologin=None, ssh=None, expand_fs=None):
     print("Staring Raspberry Pi OS customisation: {}".format(img_path))
 
+    # Since bullseye 2022-04-07 an extra step is needed to create a username and password
+    set_username_password(img_path)
+
     # Increase the image by 1 GB using qemu-img
     if expand_fs or (expand_fs is None and EXPAND_FS):
         print("Expanding {} image +1GB:".format(img_path))
         print(pexpect.run("qemu-img resize {} +1G".format(img_path)))
 
+    child, docker_container_name = None, None
     try:
         child, docker_container_name = launch_docker_spawn(img_path)
         if needs_login:
@@ -166,7 +197,8 @@ def run_edits(img_path, needs_login=True, autologin=None, ssh=None, expand_fs=No
         child.wait()
     # Let ay exceptions bubble up, but ensure clean-up is run
     finally:
-        close_container(child, docker_container_name)
+        if child:
+            close_container(child, docker_container_name)
 
 
 if __name__ == "__main__":

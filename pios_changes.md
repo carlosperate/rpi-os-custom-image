@@ -1,9 +1,13 @@
 # Raspberry Pi OS Relevant Changes
 
-A list to capture important or relevant Raspberry Pi OS changes
+A list to capture important or relevant Raspberry Pi OS changes.
+
+The official changelog:
+https://downloads.raspberrypi.org/raspios_lite_armhf/release_notes.txt
 
 - 2022-04-07 Bullseye: No longer ships with default username and password
     - https://www.raspberrypi.com/news/raspberry-pi-bullseye-update-april-2022/
+    - piwiz first boot wizzard, now runs in a separate session as a different user
 - 2022-01-28 Bullseye: First official 64 bit releases
     - Pi 3+ and Zero W 2+
     - https://www.raspberrypi.com/news/raspberry-pi-os-64-bit/
