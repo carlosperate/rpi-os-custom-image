@@ -16,7 +16,7 @@ import requests
 # Configuration data start
 
 DEFAULT_IMG_RELEASE = "bullseye"
-DEFAULT_IMG_VERSION = "2022-09-26"
+DEFAULT_IMG_TAG = "2022-09-26"
 
 # Configuration data end
 ###############################################################################
@@ -108,7 +108,7 @@ OS_IMGS = {
         )
     }
 }
-DEFAULT_IMAGE_URL = OS_IMGS[DEFAULT_IMG_RELEASE][DEFAULT_IMG_VERSION]
+DEFAULT_IMAGE_URL = OS_IMGS[DEFAULT_IMG_RELEASE][DEFAULT_IMG_TAG]
 
 
 def download_compressed_image(img: ImageURL = DEFAULT_IMAGE_URL) -> str:

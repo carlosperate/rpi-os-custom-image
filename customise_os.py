@@ -6,6 +6,7 @@ import sys
 import uuid
 import time
 import subprocess
+from datetime import datetime
 
 import pexpect
 
@@ -126,8 +127,46 @@ def enable_autologin(child):
     child.expect_exact(BASH_PROMPT)
 
 
-def enable_ssh(child):
-    child.sendline("sudo systemctl enable ssh")
+def enable_ssh(child, img_tag):
+    """Enable SSH on boot.
+
+    From Bullseye 2022-09-26, the 'systemctl' method SSH fails to start on boot:
+        [FAILED] Failed to start Regenerate SSH host keys.
+        [FAILED] Failed to start OpenBSD Secure Shell server.
+    So we can use 'raspi-config' as the "new method", but the do_ssh option
+    might not be available in older Pi OS releases, so still run the
+    "old method" in those.
+    https://www.raspberrypi.com/documentation/computers/configuration.html#the-raspi-config-command-line-interface
+
+    For versions newer than 2022-09-26, and older than ????-??-??, it also
+    need to update 'raspberrypi-sys-mods'
+    https://github.com/RPi-Distro/pi-gen/issues/682#issuecomment-1001047955
+    https://github.com/raspberrypi/linux/issues/5390
+    https://github.com/RPi-Distro/pi-gen/issues/682
+    https://github.com/RPi-Distro/raspberrypi-sys-mods/pull/71
+
+    :param child: The pexpect spawn child process to run commands in.
+    :param img_tag: The date of the image in YYYY-MM-DD format.
+    """
+    try:
+        img_date = datetime.strptime(img_tag, "%Y-%m-%d")
+    except ValueError:
+        # Not a valid date to compare, default to the new method
+        pass
+    else:
+        # Old method should still work in older versions where raspi-config might not have 'do_ssh'
+        if img_date < datetime(year=2022, month=9, day=26):
+            child.sendline("sudo systemctl enable ssh")
+            child.expect_exact(BASH_PROMPT)
+            return
+        if img_date <= datetime(year=2022, month=9, day=26):
+            # For versions between 2022-09-26 and ????-??-??, we need to
+            # update 'raspberrypi-sys-mods' and then run 'raspi-config'
+            child.sendline("sudo apt install -y raspberrypi-sys-mods")
+            child.expect_exact(BASH_PROMPT)
+
+    # Current method uses raspi-config, which should be supported in all buster+ releases
+    child.sendline("sudo raspi-config nonint do_ssh 0")
     child.expect_exact(BASH_PROMPT)
 
 
@@ -169,7 +208,7 @@ def close_container(child, docker_container_name):
             print('! Docker container was already stopped.')
 
 
-def run_edits(img_path, needs_login=True, autologin=None, ssh=None, expand_fs=None):
+def run_edits(img_path, img_tag=None, needs_login=True, autologin=None, ssh=None, expand_fs=None):
     print("Staring Raspberry Pi OS customisation: {}".format(img_path))
 
     # Since bullseye 2022-04-07 an extra step is needed to create a username and password
@@ -188,7 +227,7 @@ def run_edits(img_path, needs_login=True, autologin=None, ssh=None, expand_fs=No
         if autologin or (autologin is None and AUTOLOGIN):
             enable_autologin(child)
         if ssh or (ssh is None and SSH):
-            enable_ssh(child)
+            enable_ssh(child, img_tag)
         if expand_fs or (expand_fs is None and EXPAND_FS):
             expand_root_fs(child)
         # We are done, let's exit
