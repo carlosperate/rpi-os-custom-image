@@ -88,16 +88,36 @@ def launch_docker_spawn(img_path):
     return child, docker_container_name
 
 
-def login(child):
+def login(child, img_tag):
+    """Login to the Raspberry Pi OS image.
+
+    Since the 2022-04 bullseye release the first boot wizard creates an
+    an account based from the userconf file in the boot partition.
+    This first boot wizard runs in a different session as a different user,
+    so sometimes it can take a while before it's able to create the user and
+    we need to wait before attempting to login.
+
+    :param child: The pexpect spawn child process to run commands in.
+    :param img_tag: The date of the image in YYYY-MM-DD format.
+    """
+    extra_wait_time = True
+    try:
+        img_date = datetime.strptime(img_tag, "%Y-%m-%d")
+    except ValueError:
+        # Not a valid date to compare, keep default to wait
+        pass
+    else:
+        # Older releases don't need to wait
+        if img_date < datetime(year=2022, month=4, day=1):
+            extra_wait_time = False
+
     child.expect_exact("raspberrypi login: ")
-    # Since the 2022-04 bullseye release the first boot wizard creates an
-    # an account based on userconf.
-    # This first boot wizard runs in a different session as a different user,
-    # so sometimes it can take a while before it's able to create the user
-    time.sleep(90)
+    if extra_wait_time:
+        time.sleep(90)
     child.sendline(RPI_OS_USERNAME)
     child.expect_exact("Password: ")
-    time.sleep(5)
+    if extra_wait_time:
+        time.sleep(5)
     child.sendline(RPI_OS_PASSWORD)
     child.expect_exact(BASH_PROMPT)
 
@@ -162,6 +182,8 @@ def enable_ssh(child, img_tag):
         if img_date <= datetime(year=2022, month=9, day=26):
             # For versions between 2022-09-26 and ????-??-??, we need to
             # update 'raspberrypi-sys-mods' and then run 'raspi-config'
+            child.sendline("sudo apt update -qq")
+            child.expect_exact(BASH_PROMPT)
             child.sendline("sudo apt install -y raspberrypi-sys-mods")
             child.expect_exact(BASH_PROMPT)
 
@@ -170,18 +192,32 @@ def enable_ssh(child, img_tag):
     child.expect_exact(BASH_PROMPT)
 
 
-def expand_root_fs(child):
-    # Temporary solution for older Raspbian issue: sda2 is not on SD card. Don't know how to expand
-    # https://www.raspberrypi.org/forums/viewtopic.php?t=44856#p563673
-    # child.sendline("sed -e 's/mmcblk0p/sda/' -e 's/mmcblk0/sda/' /usr/bin/raspi-config > ~/raspi-config")
-    # child.expect_exact(BASH_PROMPT)
-    # child.sendline("chmod +x ~/raspi-config")
-    # child.expect_exact(BASH_PROMPT)
-    # child.sendline("sudo ~/raspi-config --expand-rootfs")
-    # child.expect_exact(BASH_PROMPT)
-    # child.sendline("rm ~/raspi-config")
-    # child.expect_exact(BASH_PROMPT)
-    # end of old solution
+def expand_root_fs(child, img_tag):
+    """Expand the root filesystem to use the all space configured in .img file.
+
+    :param child: The pexpect spawn child process to run commands in.
+    :param img_tag: The date of the image in YYYY-MM-DD format.
+    """
+    try:
+        img_date = datetime.strptime(img_tag, "%Y-%m-%d")
+    except ValueError:
+        # Not a valid date to compare, default to the newer method
+        pass
+    else:
+        if img_date < datetime(year=2020, month=5, day=1):
+            # Temporary solution for older Raspbian issue: sda2 is not on SD card. Don't know how to expand
+            # https://www.raspberrypi.org/forums/viewtopic.php?t=44856#p563673
+            child.sendline("sed -e 's/mmcblk0p/sda/' -e 's/mmcblk0/sda/' /usr/bin/raspi-config > ~/raspi-config")
+            child.expect_exact(BASH_PROMPT)
+            child.sendline("chmod +x ~/raspi-config")
+            child.expect_exact(BASH_PROMPT)
+            child.sendline("sudo ~/raspi-config --expand-rootfs")
+            child.expect_exact(BASH_PROMPT)
+            child.sendline("rm ~/raspi-config")
+            child.expect_exact(BASH_PROMPT)
+            return
+
+    # This simpler method works in any newer release
     child.sendline("sudo raspi-config --expand-rootfs")
     child.expect_exact(BASH_PROMPT)
 
@@ -223,13 +259,13 @@ def run_edits(img_path, img_tag=None, needs_login=True, autologin=None, ssh=None
     try:
         child, docker_container_name = launch_docker_spawn(img_path)
         if needs_login:
-            login(child)
+            login(child, img_tag)
         if autologin or (autologin is None and AUTOLOGIN):
             enable_autologin(child)
         if ssh or (ssh is None and SSH):
             enable_ssh(child, img_tag)
         if expand_fs or (expand_fs is None and EXPAND_FS):
-            expand_root_fs(child)
+            expand_root_fs(child, img_tag)
         # We are done, let's exit
         child.sendline("sudo shutdown now")
         child.expect(pexpect.EOF)
