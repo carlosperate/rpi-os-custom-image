@@ -13,37 +13,31 @@ jobs:
     runs-on: ubuntu-latest
     name: Generate custom images
     steps:
-      - name: Install qemu-img
+      - name: Install qemu-img, fdisk and mtools
         run: sudo apt-get update && sudo apt-get install -y qemu-utils fdisk mtools
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: "3.8"
       - name: Install Python dependencies
         run: pip install -r requirements.txt
       - name: Download official image and create custom images
         run: python run_all.py
-      - name: Upload autologin image
-        uses: actions/upload-artifact@v2
-        with:
-          name: raspberry-pi-os-autologin-img
-          path: rpiosimage/*-autologin.img
-          if-no-files-found: error
       - name: Upload autologin + ssh image
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: raspberry-pi-os-autologin-ssh-img
           path: rpiosimage/*-autologin-ssh.img
           if-no-files-found: error
       - name: Upload autologin + ssh + expanded image
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: raspberry-pi-os-autologin-ssh-expanded-img
           path: rpiosimage/*-autologin-ssh-expanded.img
           if-no-files-found: error
       - name: Upload Mu image
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: raspberry-pi-os-mu
           path: rpiosimage/*-mu.img
@@ -60,29 +54,8 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
         shell: bash
 
-      - name: Download autologin OS image
-        uses: actions/download-artifact@v2
-        id: download-zip-autologin
-        with:
-          name: raspberry-pi-os-autologin-img
-          path: autologin
-      - name: Zip image again
-        run: |
-          cd ${{steps.download-zip-autologin.outputs.download-path}}
-          ls
-          zip -r raspberry-pi-os-lite-${{ steps.get_version.outputs.VERSION }}-autologin.zip ./*
-      - name: Upload autologin OS image as release asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{github.event.release.upload_url}}
-          asset_path: ${{steps.download-zip-autologin.outputs.download-path}}/raspberry-pi-os-lite-${{ steps.get_version.outputs.VERSION }}-autologin.zip
-          asset_name: raspberry-pi-os-lite-${{ steps.get_version.outputs.VERSION }}-autologin.zip
-          asset_content_type: application/zip
-
       - name: Download autologin + ssh OS image
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         id: download-zip-autologin-ssh
         with:
           name: raspberry-pi-os-autologin-ssh-img
@@ -103,7 +76,7 @@ jobs:
           asset_content_type: application/zip
 
       - name: Download autologin + ssh + expanded OS image
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         id: download-zip-autologin-ssh-expanded
         with:
           name: raspberry-pi-os-autologin-ssh-expanded-img
@@ -124,7 +97,7 @@ jobs:
           asset_content_type: application/zip
 
       - name: Download Mu image
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         id: download-zip-mu
         with:
           name: raspberry-pi-os-mu

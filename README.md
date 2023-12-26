@@ -8,7 +8,6 @@ But they can also be used like normal OS images in a physical Raspberry Pi, or
 any other emulation method.
 
 Currently the following images are being created:
-- Raspberry Pi OS Lite + autologin enabled
 - Raspberry Pi OS Lite + autologin + ssh enabled
 - Raspberry Pi OS Lite + autologin + ssh + resized image (+1GB)
 - Raspberry Pi OS Lite + autologin + ssh + resized image (+1GB) + specific app dependencies
