@@ -22,7 +22,7 @@ EXPAND_FS = False
 # Configuration data end
 ###############################################################################
 
-DOCKER_IMAGE = "ghcr.io/carlosperate/qemu-rpi-vm:2024-01-03"
+DOCKER_IMAGE = "lukechilds/dockerpi:vm"
 
 RPI_OS_USERNAME = "pi"
 RPI_OS_PASSWORD = "raspberry"
