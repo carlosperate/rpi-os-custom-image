@@ -15,8 +15,8 @@ import requests
 ###############################################################################
 # Configuration data start
 
-DEFAULT_IMG_RELEASE = "buster-legacy"
-DEFAULT_IMG_TAG = "2023-02-22"
+DEFAULT_IMG_RELEASE = "bullseye"
+DEFAULT_IMG_TAG = "2023-05-03"
 
 # Configuration data end
 ###############################################################################
@@ -34,6 +34,10 @@ ImageURL = namedtuple("ImageURL", ["url", "sha256_url"])
 # Legacy info https://www.raspberrypi.com/news/new-old-functionality-with-raspberry-pi-os-legacy/
 OS_IMGS = {
     "bullseye" : {
+        "2023-05-03": ImageURL(
+            url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2023-05-03/2023-05-03-raspios-bullseye-armhf-lite.img.xz",
+            sha256_url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2023-05-03/2023-05-03-raspios-bullseye-armhf-lite.img.xz.sha256",
+        ),
         "2023-02-22": ImageURL(
             url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2023-02-22/2023-02-21-raspios-bullseye-armhf-lite.img.xz",
             sha256_url="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2023-02-22/2023-02-21-raspios-bullseye-armhf-lite.img.xz.sha256",
