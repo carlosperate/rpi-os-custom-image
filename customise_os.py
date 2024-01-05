@@ -158,7 +158,7 @@ def enable_ssh(child, img_tag):
     "old method" in those.
     https://www.raspberrypi.com/documentation/computers/configuration.html#the-raspi-config-command-line-interface
 
-    For versions newer than 2022-09-26, and older than ????-??-??, it also
+    For versions newer than 2022-09-26, and older than 2023-02-22, it also
     need to update 'raspberrypi-sys-mods'
     https://github.com/RPi-Distro/pi-gen/issues/682#issuecomment-1001047955
     https://github.com/raspberrypi/linux/issues/5390
@@ -179,8 +179,8 @@ def enable_ssh(child, img_tag):
             child.sendline("sudo systemctl enable ssh")
             child.expect_exact(BASH_PROMPT)
             return
-        if img_date <= datetime(year=2022, month=9, day=26):
-            # For versions between 2022-09-26 and ????-??-??, we need to
+        if img_date <= datetime(year=2023, month=2, day=22):
+            # For versions between 2022-09-26 and 2023-02-22, we need to
             # update 'raspberrypi-sys-mods' and then run 'raspi-config'
             child.sendline("sudo apt update -qq")
             child.expect_exact(BASH_PROMPT)
